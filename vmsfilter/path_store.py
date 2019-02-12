@@ -1,3 +1,5 @@
+from typing import Dict
+
 from enum import Enum
 from threading import Lock
 
@@ -18,12 +20,13 @@ class Path:
     def __init__(self, id_):
         self.id: int = id_
         self.suspicion_state: SuspicionState = None
+        self.last_seen = (-1, -1)
 
 
 class PathStorage:
     def __init__(self):
         self.tracked_paths: BucketDict[int, Path, int] = BucketDict(lambda x: x.suspicion_state)
-        self.blacklist = set()
+        self.blacklist: Dict[int, Path] = {}
         self.habitat_area = None
         self.ignore_areas = []
         self.hostile_areas = []
@@ -48,11 +51,13 @@ class PathStorage:
     def add_object(self, data):
         id = int(data["global_object_id"])
         with self.tracked_lock:
-            if id in self.blacklist:
-                return
-            path: Path = self.tracked_paths.get(id)
             point = data["Location"]["VmsCoordinateFootprint"]["Center"]["VmsCoordinate"]
             x, y = float(point["x"]), float(point["y"])
+            path: Path = self.blacklist.get(id)
+            if path:
+                path.last_seen = (x,y)
+                return
+            path = self.tracked_paths.get(id)
             point = ogr.Geometry(ogr.wkbPoint)
             point.AddPoint(x, y)
 
@@ -64,17 +69,24 @@ class PathStorage:
                     path.suspicion_state = SuspicionState.in_habitat
                 else:
                     path.suspicion_state = SuspicionState.not_suspect
-
                 self.tracked_paths[path.id] = path
             else:
                 self._update_suspicion(path, point)
+
+            path.last_seen = (x, y)
+
+    def location_for(self, id_: int):
+        path = self.blacklist.get(id_) or self.tracked_paths.get(id_)
+        if path:
+            return path.last_seen
+        return None
 
     def get_most_suspicious(self):
         with self.tracked_lock:
             ret = self.tracked_paths.highest()
             if ret:
                 del self.tracked_paths[ret.id]
-                self.blacklist.add(ret)
+                self.blacklist[ret.id] = ret
             return ret
 
     def load_areas(self, hostile_path, habitat_path, ignore_path):

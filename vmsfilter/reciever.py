@@ -41,9 +41,16 @@ if __name__ == '__main__':
                     else:
                         tid = target.id
                     await websocket.send(str(tid))
+            if path == "/get_location":
+                async for message in websocket:
+                    id_ = int(message)
+                    loc = path_store.location_for(id_)
+                    coords = list(loc) if loc else []
+                    await websocket.send(json.dumps(coords))
+
         except websockets.ConnectionClosed:
             pass
 
 
-    asyncio.get_event_loop().run_until_complete(websockets.serve(echo, 'localhost', 80))
+    asyncio.get_event_loop().run_until_complete(websockets.serve(echo, 'localhost', 11235))
     asyncio.get_event_loop().run_forever()
