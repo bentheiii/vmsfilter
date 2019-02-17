@@ -3,7 +3,7 @@ import json
 
 import websockets
 
-root = 'ws://localhost:11235'
+root = 'ws://192.168.20.100:11235'
 
 obj_uri = root + "/manual_set"
 get_uri = root + "/get_target"
