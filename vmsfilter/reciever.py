@@ -22,12 +22,12 @@ if __name__ == '__main__':
     parser.add_argument('-p', dest='targeter_tcp_port', type=int, help='tcp port of the targeter server', required=True)
     args = parser.parse_args()
 
-    hostile_areas_path = args.hostile_areas  # r"D:\git\vmsfilter\resources\hostile.shp"
-    habitat_area_path = args.habitat_areas  # r"D:\git\vmsfilter\resources\habitat.shp"
-    ignore_areas_path = args.ignore_areas  # r"D:\git\vmsfilter\resources\ignore.shp"
+    hostile_areas_path = args.hostile_areas
+    habitat_area_path = args.habitat_areas
+    ignore_areas_path = args.ignore_areas
 
-    eyes_path = args.eyes_ws_path  # "ws://192.168.20.102:7225"  # ws path
-    targeter_path = args.targeter_tcp_ip, args.targeter_tcp_port  # ('192.168.20.104', 11235)  # TCP path
+    eyes_path = args.eyes_ws_path
+    targeter_path = args.targeter_tcp_ip, args.targeter_tcp_port
 
     path_store = PathStorage()
     path_store.load_areas(hostile_areas_path, habitat_area_path, ignore_areas_path)
