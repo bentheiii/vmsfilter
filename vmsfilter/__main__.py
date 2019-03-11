@@ -107,9 +107,7 @@ if __name__ == '__main__':
                                     data = path_store.data_for(cur_target_id)
                                     t = time()
                                     last_seen = data.get('time')
-                                    print(f'{time_to_lose} vs {last_seen} - {t}')
                                     if last_seen and (t - last_seen) > time_to_lose:
-                                        print('tr')
                                         timeout_retarget = True
 
                                 if cur_target_id == -1 or timeout_retarget:
