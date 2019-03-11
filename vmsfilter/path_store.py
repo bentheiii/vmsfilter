@@ -87,7 +87,7 @@ class PathStorage:
             if path:
                 ret = {'suspicion_state': path.suspicion_state.name, **path.last_data}
                 return ret
-        return None
+        return {}
 
     def get_most_suspicious(self):
         with self.tracked_lock:

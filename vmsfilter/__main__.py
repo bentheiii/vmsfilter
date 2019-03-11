@@ -107,7 +107,9 @@ if __name__ == '__main__':
                                     data = path_store.data_for(cur_target_id)
                                     t = time()
                                     last_seen = data.get('time')
-                                    if last_seen and (last_seen - t) > time_to_lose:
+                                    print(f'{time_to_lose} vs {last_seen} - {t}')
+                                    if last_seen and (t - last_seen) > time_to_lose:
+                                        print('tr')
                                         timeout_retarget = True
 
                                 if cur_target_id == -1 or timeout_retarget:
@@ -120,7 +122,8 @@ if __name__ == '__main__':
                                     break
 
                         data = path_store.data_for(cur_target_id)
-                        d = {'id': cur_target_id, **data, **path_store.additional_info}
+                        additional_info = path_store.additional_info
+                        d = {'id': cur_target_id, **data, **additional_info}
                         sock.send(bytes(json.dumps(d) + '\n', 'utf-8'))
                         await asyncio.sleep(0.15)
             except (ConnectionRefusedError, TimeoutError, socket.timeout):
